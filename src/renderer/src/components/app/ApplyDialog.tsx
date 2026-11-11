@@ -112,77 +112,81 @@ export function ApplyDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <PenLine className="size-4 text-lemon-ink" /> Write to {labelFor(right.root)} ·{' '}
-            {right.rel}
+      <DialogContent className="flex max-h-[calc(100dvh-2rem)] min-w-0 max-w-xl flex-col overflow-hidden">
+        <DialogHeader className="max-h-[35dvh] min-w-0 shrink-0 overflow-y-auto pr-6">
+          <DialogTitle className="flex min-w-0 shrink-0 items-start gap-2">
+            <PenLine className="mt-0.5 size-4 shrink-0 text-lemon-ink" />
+            <span className="min-w-0 [overflow-wrap:anywhere]">
+              Write to {labelFor(right.root)} · {right.rel}
+            </span>
           </DialogTitle>
-          <DialogDescription className="flex items-center gap-1.5 font-mono text-xs">
+          <DialogDescription className="grid min-w-0 shrink-0 gap-1.5 overflow-hidden font-mono text-xs [&>span]:w-full">
             <FileLabel file={left} />
             <ArrowRight className="size-3 shrink-0" />
             <FileLabel file={right} />
           </DialogDescription>
         </DialogHeader>
 
-        <ul
-          className="max-h-72 divide-y overflow-auto rounded-md border"
-          aria-label="Keys to write"
-        >
-          {candidates.map((a) => {
-            const on = chosen.has(a.key)
-            return (
-              <li key={a.key}>
-                <label
-                  className={cn(
-                    'flex cursor-pointer items-center gap-3 px-3 py-2 text-sm',
-                    on && 'bg-lemon-soft/50'
-                  )}
-                >
-                  <input
-                    type="checkbox"
-                    checked={on}
-                    onChange={() => toggle(a.key)}
-                    className="accent-(--lemon-ink)"
-                  />
-                  <span className={cn('w-4 font-mono text-xs', OP[a.op].tone)} aria-hidden="true">
-                    {OP[a.op].glyph}
-                  </span>
-                  <span className="min-w-0 flex-1 truncate font-mono text-xs">{a.key}</span>
-                  <span className="font-mono text-[11px] text-muted-foreground">{a.op}</span>
-                </label>
-              </li>
-            )
-          })}
-          {candidates.length === 0 && (
-            <li className="px-3 py-4 text-center text-xs text-muted-foreground">
-              Nothing to write.
-            </li>
-          )}
-        </ul>
-
-        <p className="flex items-start gap-2 text-xs text-muted-foreground">
-          <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-lemon-ink" aria-hidden="true" />
-          <span>
-            {remote
-              ? `The ticked values are read from ${left.name} again right before the write; blank and names-only values are never sent. ${PRODUCT} re-reads B too and refuses if either side moved since this plan. `
-              : `The ticked keys are copied from ${left.name} exactly as written there. ${PRODUCT} takes a snapshot of ${right.name} first and won\u2019t write if the file changed in the meantime. `}
-            Keys that only exist in {right.name} are left alone.
-          </span>
-        </p>
-        <p className="rounded-md border border-lemon-ink/30 bg-lemon-soft/40 px-3 py-2 text-xs">
-          <span className="font-medium">What this does on {labelFor(right.root)}: </span>
-          {WRITE_CONSEQUENCE[kind]}
-        </p>
-        {error && (
-          <p
-            role="alert"
-            className="rounded-md border border-bad/30 bg-bad-soft px-3 py-2 text-xs text-bad"
+        <div className="min-h-0 min-w-0 space-y-4 overflow-y-auto [overflow-wrap:anywhere]">
+          <ul
+            className="max-h-72 divide-y overflow-auto rounded-md border"
+            aria-label="Keys to write"
           >
-            {error}
+            {candidates.map((a) => {
+              const on = chosen.has(a.key)
+              return (
+                <li key={a.key}>
+                  <label
+                    className={cn(
+                      'flex cursor-pointer items-center gap-3 px-3 py-2 text-sm',
+                      on && 'bg-lemon-soft/50'
+                    )}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={on}
+                      onChange={() => toggle(a.key)}
+                      className="accent-(--lemon-ink)"
+                    />
+                    <span className={cn('w-4 font-mono text-xs', OP[a.op].tone)} aria-hidden="true">
+                      {OP[a.op].glyph}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate font-mono text-xs">{a.key}</span>
+                    <span className="font-mono text-[11px] text-muted-foreground">{a.op}</span>
+                  </label>
+                </li>
+              )
+            })}
+            {candidates.length === 0 && (
+              <li className="px-3 py-4 text-center text-xs text-muted-foreground">
+                Nothing to write.
+              </li>
+            )}
+          </ul>
+
+          <p className="flex items-start gap-2 text-xs text-muted-foreground">
+            <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-lemon-ink" aria-hidden="true" />
+            <span className="min-w-0">
+              {remote
+                ? `The ticked values are read from ${left.name} again right before the write; blank and names-only values are never sent. ${PRODUCT} re-reads B too and refuses if either side moved since this plan. `
+                : `The ticked keys are copied from ${left.name} exactly as written there. ${PRODUCT} takes a snapshot of ${right.name} first and won\u2019t write if the file changed in the meantime. `}
+              Keys that only exist in {right.name} are left alone.
+            </span>
           </p>
-        )}
-        <DialogFooter>
+          <p className="rounded-md border border-lemon-ink/30 bg-lemon-soft/40 px-3 py-2 text-xs">
+            <span className="font-medium">What this does on {labelFor(right.root)}: </span>
+            {WRITE_CONSEQUENCE[kind]}
+          </p>
+          {error && (
+            <p
+              role="alert"
+              className="rounded-md border border-bad/30 bg-bad-soft px-3 py-2 text-xs text-bad"
+            >
+              {error}
+            </p>
+          )}
+        </div>
+        <DialogFooter className="shrink-0">
           <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={busy}>
             Cancel
           </Button>
